@@ -79,6 +79,7 @@ Assets/
       ├─ Input/              # asmdef: Nordo.Input
       ├─ Player/             # asmdef: Nordo.Player
       ├─ CameraFeel/         # asmdef: Nordo.CameraFeel (modular camera-effect stack)
+      ├─ Lighting/           # asmdef: Nordo.Lighting    (flashlight, battery, flicker, light visibility)
       ├─ Interaction/        # asmdef: Nordo.Interaction
       ├─ Enemy/              # asmdef: Nordo.Enemy
       ├─ Items/              # asmdef: Nordo.Items         (item definitions & pickup events)
@@ -141,7 +142,7 @@ Each milestone **must compile and be testable** before the next begins.
 | **M1** | **Core Foundation & First-Person Movement** | Folder/asmdef skeleton, EventBus, bootstrap, Input System asset, walk/look/sprint/crouch/jump, gravity | — |
 | **M2** ✅ | **Camera Feel & Footsteps** | Modular camera-effect stack (head-bob, sway, landing impact, move-tilt), smooth look, surface-aware footsteps with speed-driven cadence, breath + cold-breath hooks | M1 |
 | **M3** ✅ | **Interaction & Physics** | `IInteractable` + raycast interactor, prompts, highlight, doors/drawers/cabinets, lockables, item pickups, grab/throw, inspection, physics impact noise, **central NoiseSystem** with propagation + occlusion + priority | M1 |
-| **M4** | **Flashlight & Lighting** | Battery-driven flashlight, dynamic light setup, battery pickups, diegetic charge indicator | M1, M3 |
+| **M4** ✅ | **Flashlight & Lighting** | Battery model + flashlight, modular flicker/instability/low-battery/emergency modulators, quality presets, volumetric-beam support, diegetic indicator, battery pickups (item-integrated), save state, **light-visibility service (AI hook)** | M1, M3 |
 | **M5** | **Noise System** | Central `NoiseSystem` service, noise emitters on movement/items/machinery, debug visualizer | M1, M3 |
 | **M6** | **Inventory & Items** | `ItemDefinition` SOs, inventory model, keys/batteries/tools, randomized seeded placement | M1, M3 |
 | **M7** | **Enemy AI** | NavMesh agent, patrol → hearing → investigate → search → chase → attack → lose → return FSM, memory | M1, M5, M2 |
@@ -221,4 +222,23 @@ distance and optional **occlusion** raycast and delivers only perceivable sounds
 `INoiseListener`s. The Milestone-7 enemy will simply subclass `NoiseListenerBase`; the entire
 acoustic-stealth pillar is now standing and testable with the `DebugNoiseListener`.
 
-*Last updated: Milestone 3.*
+### New in Milestone 4 — the flashlight & lighting
+
+The flashlight is **composed of small, single-responsibility parts** rather than one monolith. A pure
+`Battery` class (no Unity deps, fully unit-tested) holds charge; a stack of `ILightModulator`
+components (random instability, low-battery, emergency flicker) each return a brightness multiplier
+that `FlashlightController` combines — the same additive/composable pattern as the camera-effect
+stack, so new light behaviours are drop-in. `FlashlightSettings` and `LightQualityPreset` keep beam
+tuning and shadow quality as data.
+
+Two forward-looking seams land here:
+- **`ILightVisibilityService`** (Core) aggregates `ILightSource`s; the flashlight registers as one and
+  answers "how lit is this world point?" with range/cone/occlusion. This is the **AI hook** — fully
+  functional but unconsumed until the Milestone-7 enemy queries it.
+- **`ISaveable<TState>`** (Core) is introduced now so the flashlight has genuine save/load
+  (`FlashlightState`) ahead of the Milestone-9 save service, which will simply collect these.
+
+Battery pickups live in the interaction layer and emit **both** a `BatteryCollectedEvent` (immediate
+recharge) and an `ItemPickedUpEvent` (inventory record) — integrated with the existing item system.
+
+*Last updated: Milestone 4.*

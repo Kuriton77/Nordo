@@ -1,0 +1,17 @@
+{
+    "name": "Nordo.Lighting",
+    "rootNamespace": "Nordo.Lighting",
+    "references": [
+        "Nordo.Core",
+        "Nordo.Input"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

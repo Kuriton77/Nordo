@@ -4,6 +4,7 @@
     "references": [
         "Nordo.Core",
         "Nordo.CameraFeel",
+        "Nordo.Lighting",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner"
     ],

@@ -41,6 +41,7 @@ It shares only a genre with other horror titles — nothing else.
 | [`docs/MILESTONE-01.md`](docs/MILESTONE-01.md) | Milestone 1 — Core foundation & first-person movement (test guide) |
 | [`docs/MILESTONE-02.md`](docs/MILESTONE-02.md) | Milestone 2 — Camera feel & footsteps (test guide) |
 | [`docs/MILESTONE-03.md`](docs/MILESTONE-03.md) | Milestone 3 — Interaction framework & noise system (test guide) |
+| [`docs/MILESTONE-04.md`](docs/MILESTONE-04.md) | Milestone 4 — Flashlight & dynamic lighting (test guide) |
 
 ## Project Layout (top level)
 
@@ -59,4 +60,4 @@ Nordo/
 
 ## Status
 
-🚧 **Milestone 3 complete** (interaction framework & noise system). See the roadmap in `docs/ARCHITECTURE.md`.
+🚧 **Milestone 4 complete** (flashlight & dynamic lighting). See the roadmap in `docs/ARCHITECTURE.md`.
