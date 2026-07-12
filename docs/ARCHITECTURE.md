@@ -79,6 +79,7 @@ Assets/
       ├─ Input/              # asmdef: Nordo.Input
       ├─ Player/             # asmdef: Nordo.Player
       ├─ CameraFeel/         # asmdef: Nordo.CameraFeel (modular camera-effect stack)
+      ├─ Rendering/          # asmdef: Nordo.Rendering  (LOCKED PSX art direction: palette, fog, atmosphere)
       ├─ Lighting/           # asmdef: Nordo.Lighting    (flashlight, battery, flicker, light visibility)
       ├─ Interaction/        # asmdef: Nordo.Interaction
       ├─ Enemy/              # asmdef: Nordo.Enemy
@@ -189,6 +190,17 @@ Each milestone **must compile and be testable** before the next begins.
 - No allocations in `Update`/`FixedUpdate` hot paths; cache components in `Awake`.
 - Namespaces mirror assemblies: `Nordo.Core`, `Nordo.Player`, etc.
 - Prefer events over polling; prefer `ScriptableObject` config over magic numbers.
+
+### Art direction (LOCKED — binding)
+
+The project's visual identity is **permanently locked** to a **modern PSX horror** aesthetic. See
+**[`docs/ART_DIRECTION.md`](ART_DIRECTION.md)** — it is binding on every environment, prop, shader,
+material, lighting setup, and visual effect. In short: low-poly, 128–256px point-filtered textures,
+heavy cold fog, a cold blue-grey palette, harsh shadows, few lights, slight vertex jitter, strong
+silhouettes, performance-first. **No realistic/photorealistic assets.** World content uses the
+`Nordo/PSX` shader; every scene carries a `SceneAtmosphere` fed by the project `PSXPalette`; the
+optional CRT/VHS pass uses `Nordo/CRT`. Any future milestone that produces visuals must pass the
+compliance checklist in that document.
 
 ---
 

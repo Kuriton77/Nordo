@@ -7,6 +7,7 @@
         "Nordo.Enemy",
         "Nordo.Interaction",
         "Nordo.Lighting",
+        "Nordo.Rendering",
         "Unity.AI.Navigation"
     ],
     "includePlatforms": [],

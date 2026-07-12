@@ -7,6 +7,7 @@ using Nordo.Noise;
 using Nordo.Lighting;
 using Nordo.Enemy;
 using Nordo.Interaction;
+using Nordo.Rendering;
 
 namespace Nordo.VerticalSlice
 {
@@ -83,6 +84,12 @@ namespace Nordo.VerticalSlice
             if (Object.FindObjectOfType<LightVisibilitySystem>() == null)
             {
                 new GameObject("LightVisibilitySystem").AddComponent<LightVisibilitySystem>();
+            }
+
+            // Enforce the locked art direction: heavy cold fog + dim ambient (docs/ART_DIRECTION.md).
+            if (Object.FindObjectOfType<SceneAtmosphere>() == null)
+            {
+                new GameObject("SceneAtmosphere").AddComponent<SceneAtmosphere>();
             }
         }
 
@@ -284,17 +291,25 @@ namespace Nordo.VerticalSlice
 
         private void CreateMaterials()
         {
-            _floorMat = MakeMaterial(new Color(0.16f, 0.17f, 0.19f));
-            _wallMat = MakeMaterial(new Color(0.22f, 0.23f, 0.25f));
-            _propMat = MakeMaterial(new Color(0.5f, 0.42f, 0.3f));
-            _doorMat = MakeMaterial(new Color(0.3f, 0.25f, 0.2f));
-            _enemyMat = MakeMaterial(new Color(0.05f, 0.05f, 0.07f));
-            _exitMat = MakeMaterial(new Color(0.15f, 0.6f, 0.3f));
+            // Colours come from the LOCKED art-direction palette (docs/ART_DIRECTION.md, §3).
+            var p = ScriptableObject.CreateInstance<PSXPalette>();
+
+            _floorMat = MakeMaterial(p.Slate);
+            _wallMat = MakeMaterial(p.DeepSteel);
+            _propMat = MakeMaterial(p.ColdGrey);
+            _doorMat = MakeMaterial(Color.Lerp(p.DeepSteel, p.ColdGrey, 0.5f));
+            _enemyMat = MakeMaterial(p.Void);
+            _exitMat = MakeMaterial(p.SicklyTeal); // a cold teal "safe" signal, still in-palette
         }
 
+        // Prefers the locked Nordo/PSX shader; falls back gracefully if it hasn't imported yet.
         private static Material MakeMaterial(Color color)
         {
-            Shader shader = Shader.Find("Universal Render Pipeline/Lit");
+            Shader shader = Shader.Find("Nordo/PSX");
+            if (shader == null)
+            {
+                shader = Shader.Find("Universal Render Pipeline/Lit");
+            }
             if (shader == null)
             {
                 shader = Shader.Find("Standard");
