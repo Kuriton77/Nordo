@@ -1,0 +1,17 @@
+{
+    "name": "Nordo.Input",
+    "rootNamespace": "Nordo.Input",
+    "references": [
+        "Nordo.Core",
+        "Unity.InputSystem"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
