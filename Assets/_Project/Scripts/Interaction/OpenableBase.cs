@@ -15,7 +15,7 @@ namespace Nordo.Interaction
     /// Public <see cref="Open"/>/<see cref="Close"/>/<see cref="Toggle"/> let puzzles drive them too.
     /// </para>
     /// </summary>
-    public abstract class OpenableBase : InteractableBase
+    public abstract class OpenableBase : InteractableBase, Nordo.Core.IAutoDoor
     {
         [Header("Openable")]
         [SerializeField] private string _openVerb = "Open";
@@ -91,6 +91,20 @@ namespace Nordo.Interaction
 
         /// <summary>Closes the object (no-op if already closed).</summary>
         public void Close() => SetOpen(false);
+
+        // --- IAutoDoor (lets The Listener push doors open in its path) ---
+
+        /// <inheritdoc />
+        public bool CanBeOpenedByAI => !IsLocked && !IsOpen;
+
+        /// <inheritdoc />
+        public void OpenForAI()
+        {
+            if (!IsLocked)
+            {
+                Open();
+            }
+        }
 
         /// <summary>Sets the open state, playing audio and emitting noise on a change.</summary>
         public void SetOpen(bool open)

@@ -88,6 +88,7 @@ Assets/
       ├─ Audio/              # asmdef: Nordo.Audio
       ├─ Save/               # asmdef: Nordo.Save
       ├─ UI/                 # asmdef: Nordo.UI
+      ├─ VerticalSlice/      # asmdef: Nordo.VerticalSlice (runtime test-area builder + director)
       └─ Game/               # asmdef: Nordo.Game (composition root / bootstrap)
 ```
 
@@ -145,7 +146,7 @@ Each milestone **must compile and be testable** before the next begins.
 | **M4** ✅ | **Flashlight & Lighting** | Battery model + flashlight, modular flicker/instability/low-battery/emergency modulators, quality presets, volumetric-beam support, diegetic indicator, battery pickups (item-integrated), save state, **light-visibility service (AI hook)** | M1, M3 |
 | **M5** ✅ | **Noise System** | Single-channel `NoiseSystem` (multi-occluder + curve falloff, non-alloc), `PlayerNoiseEmitter`, `Periodic`/`Machine` emitters, propagation visualizer, extracted+tested `NoiseAttenuation`, stress tester | M1, M3 |
 | **M6** | **Inventory & Items** | `ItemDefinition` SOs, inventory model, keys/batteries/tools, randomized seeded placement | M1, M3 |
-| **M7** | **Enemy AI** | NavMesh agent, patrol → hearing → investigate → search → chase → attack → lose → return FSM, memory | M1, M5, M2 |
+| **M7** ✅ | **Enemy AI — The Listener** *(shipped as the vertical-slice "Milestone 6")* | Blind, hearing-only FSM (Patrol→Investigate→Search→Chase→Attack→Lose→Return), suspicion + memory, NavMesh nav, AI door-opening, animator/audio hooks, difficulty config, debug gizmos, and a runtime-built playable test area | M1, M5, M2 |
 | **M8** | **Puzzle Systems** | Fuse boxes, generators, combination locks, keyed doors, hidden passages, environmental story | M3, M6 |
 | **M9** | **Save / Load** | JSON save service, scene state serialization, checkpoint & manual saves | M1, M6, M8 |
 | **M10** | **Difficulty & Endings** | Difficulty SO curves, ending resolver, station-wide state machine | M7, M8, M9 |
@@ -259,4 +260,21 @@ This closes the stealth foundation. From here the roadmap pivots to a **playable
 (inventory, puzzles, The Listener AI, one finished level, objectives, menus, save/load) — the enemy
 in Milestone 7 will simply subclass `NoiseListenerBase` and consume this channel.
 
-*Last updated: Milestone 5.*
+### New in Milestone 6 — The Listener (the vertical-slice pivot begins)
+
+The roadmap now prioritises a **playable vertical slice** over more framework, and it opens with the
+enemy because the entire acoustic system was built to feed it. **The Listener is blind** — there is no
+vision code anywhere. It is a `NoiseListenerBase` (so it receives already-attenuated noise from the
+`NoiseSystem`) driving a state-object FSM: **Patrol → Investigate → Search → Chase → Attack**, with
+lose-target and Return folded in. A **suspicion** value (topped up by what it hears, decaying over
+time) gates escalation, and a **blackboard** remembers the last heard position — the only thing a
+blind hunter can pursue. It navigates with a `NavMeshAgent`, pushes unlocked doors open in its path
+via the Core `IAutoDoor` seam (locked rooms are therefore safe), and exposes `IListenerAnimator` /
+`ListenerAudio` hooks plus rich debug gizmos. All difficulty lives in a `ListenerConfig` asset.
+
+A `Nordo.VerticalSlice` assembly builds a **playable test area at runtime** (rooms, a door, throwable
+props, a hiding nook, the patrolling Listener, an exit, and an objective HUD), bakes a NavMesh, and
+wires a caught/escape loop — so the whole hunt can be played by dropping one component into an empty
+scene alongside the existing player rig.
+
+*Last updated: Milestone 6 (The Listener).*

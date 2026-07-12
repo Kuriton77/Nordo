@@ -1,0 +1,21 @@
+{
+    "name": "Nordo.VerticalSlice",
+    "rootNamespace": "Nordo.VerticalSlice",
+    "references": [
+        "Nordo.Core",
+        "Nordo.Noise",
+        "Nordo.Enemy",
+        "Nordo.Interaction",
+        "Nordo.Lighting",
+        "Unity.AI.Navigation"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

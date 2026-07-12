@@ -1,0 +1,17 @@
+{
+    "name": "Nordo.Enemy",
+    "rootNamespace": "Nordo.Enemy",
+    "references": [
+        "Nordo.Core",
+        "Nordo.Noise"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
