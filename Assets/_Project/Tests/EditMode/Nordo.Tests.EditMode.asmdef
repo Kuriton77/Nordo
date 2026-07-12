@@ -5,6 +5,7 @@
         "Nordo.Core",
         "Nordo.CameraFeel",
         "Nordo.Lighting",
+        "Nordo.Noise",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner"
     ],

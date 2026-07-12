@@ -6,61 +6,76 @@ using Nordo.Core.Events;
 namespace Nordo.Noise
 {
     /// <summary>
-    /// The central sound-propagation service and the beating heart of Nordo's stealth. It listens
-    /// for <see cref="NoiseEvent"/>s (raised by anything that makes a sound) and
-    /// <see cref="FootstepEvent"/>s (from the footstep system), attenuates each stimulus by distance
-    /// and optional occlusion, and delivers only the perceivable ones to registered
+    /// The central sound-propagation service and the beating heart of Nordo's stealth. It listens on
+    /// the single canonical <see cref="NoiseEvent"/> channel (every emitter — footsteps, breath,
+    /// machines, impacts, doors — raises one), attenuates each stimulus by distance falloff and
+    /// multi-occluder muffling, and delivers only the perceivable results to registered
     /// <see cref="INoiseListener"/>s (the enemy's ears in Milestone 7).
     /// <para>
     /// Registered in the <see cref="ServiceLocator"/> as <see cref="INoiseService"/> so emitters and
     /// listeners never reference each other. Optimised for large levels: a cheap distance early-out
-    /// runs before any occlusion raycast, and there is zero per-noise allocation.
+    /// runs before any raycast, occlusion uses a preallocated <c>RaycastNonAlloc</c> buffer, and there
+    /// is zero per-noise heap allocation. The propagation maths lives in <see cref="NoiseAttenuation"/>
+    /// so it can be unit-tested.
     /// </para>
     /// </summary>
     [DefaultExecutionOrder(-50)] // register before most gameplay Awakes/OnEnables that might query it
     [DisallowMultipleComponent]
     public sealed class NoiseSystem : MonoBehaviour, INoiseService
     {
+        [Header("Distance Falloff")]
+        [Tooltip("Maps normalized distance (0 at source → 1 at the edge of range) to a loudness " +
+                 "multiplier. Leave as the default linear ramp, or shape it for a sharper near-field.")]
+        [SerializeField] private AnimationCurve _falloffCurve = AnimationCurve.Linear(0f, 1f, 1f, 0f);
+
         [Header("Occlusion")]
-        [Tooltip("If enabled, walls between a sound and a listener muffle it via a single raycast.")]
+        [Tooltip("If enabled, walls between a sound and a listener muffle it (one raycast per listener in range).")]
         [SerializeField] private bool _useOcclusion = true;
 
         [Tooltip("Layers that block/muffle sound (walls, doors). Should exclude the player and enemies.")]
         [SerializeField] private LayerMask _occluderMask = ~0;
 
-        [Tooltip("Fraction of loudness that survives passing through an occluder (0 = silenced, 1 = no effect).")]
-        [Range(0f, 1f)] [SerializeField] private float _occlusionTransmission = 0.35f;
+        [Tooltip("Fraction of loudness that survives passing through ONE occluder (compounds per wall).")]
+        [Range(0f, 1f)] [SerializeField] private float _occlusionTransmission = 0.4f;
 
-        [Header("Footstep → Noise Mapping")]
-        [Tooltip("Range (metres) a footstep of loudness 1 carries before attenuation.")]
-        [Range(1f, 40f)] [SerializeField] private float _footstepBaseRange = 14f;
+        [Tooltip("Max occluders counted between a sound and a listener (buffer size). Higher = costlier.")]
+        [Range(1, 32)] [SerializeField] private int _maxOccluders = 8;
+
+        [Header("Delivery")]
+        [Tooltip("Perceived loudness below this is treated as inaudible and not delivered.")]
+        [Range(0f, 0.2f)] [SerializeField] private float _audibilityFloor = 0.02f;
 
         [Header("Debug")]
         [Tooltip("Log every perceived noise to the console (very verbose; QA only).")]
         [SerializeField] private bool _logHeardNoises;
 
-        // Live listeners. A List keeps iteration allocation-free and cache-friendly for the
-        // small counts we expect (a handful of AI agents), which beats a HashSet here.
+        // Live listeners. A List keeps iteration allocation-free and cache-friendly for the small
+        // counts we expect (a handful of AI agents), which beats a HashSet here.
         private readonly List<INoiseListener> _listeners = new();
+
+        // Preallocated buffer for occlusion counting — reused every query, so no GC on the hot path.
+        private RaycastHit[] _occlusionBuffer;
 
         /// <summary>The most recent stimulus reported, exposed for debug/telemetry.</summary>
         public NoiseStimulus LastStimulus { get; private set; }
 
+        /// <summary>Number of currently registered listeners (for diagnostics/stress testing).</summary>
+        public int ListenerCount => _listeners.Count;
+
         private void Awake()
         {
+            _occlusionBuffer = new RaycastHit[Mathf.Max(1, _maxOccluders)];
             ServiceLocator.Register<INoiseService>(this);
         }
 
         private void OnEnable()
         {
             EventBus<NoiseEvent>.Subscribe(OnNoiseEvent);
-            EventBus<FootstepEvent>.Subscribe(OnFootstepEvent);
         }
 
         private void OnDisable()
         {
             EventBus<NoiseEvent>.Unsubscribe(OnNoiseEvent);
-            EventBus<FootstepEvent>.Unsubscribe(OnFootstepEvent);
         }
 
         private void OnDestroy()
@@ -112,57 +127,37 @@ namespace Nordo.Noise
                     continue;
                 }
 
-                // Linear distance falloff over the stimulus's effective range.
-                float falloff = effectiveRange > 0f ? Mathf.Clamp01(1f - distance / effectiveRange) : 0f;
-                float perceived = stimulus.Loudness * falloff;
+                int occluders = _useOcclusion ? CountOccluders(stimulus.Position, listenerPos, distance) : 0;
+                float perceived = NoiseAttenuation.Perceive(
+                    distance, effectiveRange, stimulus.Loudness, occluders, _occlusionTransmission, _falloffCurve);
 
-                // Occlusion: a wall between source and listener muffles the sound.
-                if (_useOcclusion && perceived > 0f && IsOccluded(stimulus.Position, listenerPos))
-                {
-                    perceived *= _occlusionTransmission;
-                }
-
-                if (perceived <= 0.001f)
+                if (perceived < _audibilityFloor)
                 {
                     continue;
                 }
 
                 if (_logHeardNoises)
                 {
-                    Debug.Log($"[NoiseSystem] {stimulus.Kind} heard @ {perceived:0.00} (priority {stimulus.Priority}).");
+                    Debug.Log($"[NoiseSystem] {stimulus.Kind} heard @ {perceived:0.00} " +
+                              $"(priority {stimulus.Priority}, {occluders} occluder(s)).");
                 }
 
                 listener.OnHeardNoise(in stimulus, perceived);
             }
         }
 
-        /// <summary>Single raycast test for a blocker between a sound and a listener.</summary>
-        private bool IsOccluded(Vector3 from, Vector3 to)
+        /// <summary>Counts blockers between a sound and a listener using the preallocated buffer.</summary>
+        private int CountOccluders(Vector3 from, Vector3 to, float distance)
         {
-            Vector3 direction = to - from;
-            float distance = direction.magnitude;
             if (distance <= 0.01f)
             {
-                return false;
+                return 0;
             }
 
-            return Physics.Raycast(from, direction / distance, distance, _occluderMask, QueryTriggerInteraction.Ignore);
+            Vector3 direction = (to - from) / distance;
+            return Physics.RaycastNonAlloc(from, direction, _occlusionBuffer, distance, _occluderMask, QueryTriggerInteraction.Ignore);
         }
 
         private void OnNoiseEvent(NoiseEvent evt) => ReportNoise(evt.Stimulus);
-
-        /// <summary>Translates a footstep into a stimulus with a stance-appropriate priority.</summary>
-        private void OnFootstepEvent(FootstepEvent evt)
-        {
-            SoundPriority priority = evt.Stance switch
-            {
-                LocomotionStance.Sprinting => SoundPriority.Alarming,
-                LocomotionStance.Walking => SoundPriority.Notable,
-                LocomotionStance.Crouching => SoundPriority.Minor,
-                _ => SoundPriority.Ambient
-            };
-
-            ReportNoise(new NoiseStimulus(evt.Position, evt.Loudness, _footstepBaseRange, priority, NoiseSourceKind.Footstep));
-        }
     }
 }

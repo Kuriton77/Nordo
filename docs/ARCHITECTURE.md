@@ -143,7 +143,7 @@ Each milestone **must compile and be testable** before the next begins.
 | **M2** ✅ | **Camera Feel & Footsteps** | Modular camera-effect stack (head-bob, sway, landing impact, move-tilt), smooth look, surface-aware footsteps with speed-driven cadence, breath + cold-breath hooks | M1 |
 | **M3** ✅ | **Interaction & Physics** | `IInteractable` + raycast interactor, prompts, highlight, doors/drawers/cabinets, lockables, item pickups, grab/throw, inspection, physics impact noise, **central NoiseSystem** with propagation + occlusion + priority | M1 |
 | **M4** ✅ | **Flashlight & Lighting** | Battery model + flashlight, modular flicker/instability/low-battery/emergency modulators, quality presets, volumetric-beam support, diegetic indicator, battery pickups (item-integrated), save state, **light-visibility service (AI hook)** | M1, M3 |
-| **M5** | **Noise System** | Central `NoiseSystem` service, noise emitters on movement/items/machinery, debug visualizer | M1, M3 |
+| **M5** ✅ | **Noise System** | Single-channel `NoiseSystem` (multi-occluder + curve falloff, non-alloc), `PlayerNoiseEmitter`, `Periodic`/`Machine` emitters, propagation visualizer, extracted+tested `NoiseAttenuation`, stress tester | M1, M3 |
 | **M6** | **Inventory & Items** | `ItemDefinition` SOs, inventory model, keys/batteries/tools, randomized seeded placement | M1, M3 |
 | **M7** | **Enemy AI** | NavMesh agent, patrol → hearing → investigate → search → chase → attack → lose → return FSM, memory | M1, M5, M2 |
 | **M8** | **Puzzle Systems** | Fuse boxes, generators, combination locks, keyed doors, hidden passages, environmental story | M3, M6 |
@@ -241,4 +241,22 @@ Two forward-looking seams land here:
 Battery pickups live in the interaction layer and emit **both** a `BatteryCollectedEvent` (immediate
 recharge) and an `ItemPickedUpEvent` (inventory record) — integrated with the existing item system.
 
-*Last updated: Milestone 4.*
+### New in Milestone 5 — the acoustic system, completed
+
+The noise system is now **one canonical channel**: every emitter raises a `NoiseEvent`, and
+`NoiseSystem` is its sole subscriber. Player noise (footsteps, heavy breathing, jumps) is funnelled
+through a single `PlayerNoiseEmitter`, so there is exactly one place player sound is tuned. Machinery
+(`MachineNoiseEmitter`) and environment (`PeriodicNoiseEmitter`) join the same channel, meaning a
+running generator is a real, exploitable sound the hunter can be drawn to.
+
+The **propagation model** is finished: distance falloff is a designer-tunable `AnimationCurve`, and
+occlusion now *compounds per wall* (two walls muffle as transmission²) via a preallocated
+`RaycastNonAlloc` buffer. The maths lives in the pure static `NoiseAttenuation` so it is unit-tested,
+and a `NoisePropagationVisualizer` (expanding wavefront gizmos) plus a `NoiseStressTester`
+(context-menu perf/reliability burst) make the whole system observable and validated.
+
+This closes the stealth foundation. From here the roadmap pivots to a **playable vertical slice**
+(inventory, puzzles, The Listener AI, one finished level, objectives, menus, save/load) — the enemy
+in Milestone 7 will simply subclass `NoiseListenerBase` and consume this channel.
+
+*Last updated: Milestone 5.*
