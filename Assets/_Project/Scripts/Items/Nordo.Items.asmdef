@@ -1,0 +1,16 @@
+{
+    "name": "Nordo.Items",
+    "rootNamespace": "Nordo.Items",
+    "references": [
+        "Nordo.Core"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

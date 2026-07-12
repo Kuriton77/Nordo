@@ -1,4 +1,6 @@
 using UnityEngine;
+using Nordo.Core;
+using Nordo.Core.Events;
 using Nordo.Input;
 
 namespace Nordo.Player
@@ -46,6 +48,13 @@ namespace Nordo.Player
         private float _pitch;
         private Vector2 _smoothedLook;
         private Vector2 _smoothVelocity;
+        private bool _controlLocked;
+
+        private void OnEnable() => EventBus<ControlLockEvent>.Subscribe(OnControlLock);
+
+        private void OnDisable() => EventBus<ControlLockEvent>.Unsubscribe(OnControlLock);
+
+        private void OnControlLock(ControlLockEvent evt) => _controlLocked = evt.Locked;
 
         private void Reset()
         {
@@ -64,9 +73,10 @@ namespace Nordo.Player
                 return;
             }
 
-            // Freeze aiming while the game is paused (timeScale 0) so the camera can't drift
-            // behind menus. This keeps PlayerLook decoupled from the pause owner.
-            if (Time.timeScale == 0f)
+            // Freeze aiming while paused (timeScale 0) or while control is locked (e.g. inspecting
+            // an object), so the camera can't drift. Both checks keep PlayerLook decoupled from
+            // whoever owns those states.
+            if (Time.timeScale == 0f || _controlLocked)
             {
                 return;
             }

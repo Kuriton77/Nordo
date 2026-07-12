@@ -54,8 +54,8 @@ namespace Nordo.Player
             ? Mathf.Clamp01(CurrentSpeed / _settings.SprintSpeed)
             : 0f;
 
-        /// <summary>Raw movement intent this frame (X = strafe, Y = forward).</summary>
-        public Vector2 MoveInput => _input != null ? _input.MoveInput : Vector2.zero;
+        /// <summary>Effective movement intent this frame (X = strafe, Y = forward); zero while control-locked.</summary>
+        public Vector2 MoveInput => EffectiveMoveInput;
 
         /// <summary>True when the controller is on the ground this frame.</summary>
         public bool IsGrounded { get; private set; }
@@ -69,6 +69,10 @@ namespace Nordo.Player
         private float _timeSinceSprint;
         private bool _wasGroundedLastFrame;
         private float _previousFallSpeed;
+        private bool _controlLocked;
+
+        /// <summary>Movement intent after applying the control lock (zero while locked).</summary>
+        private Vector2 EffectiveMoveInput => _controlLocked || _input == null ? Vector2.zero : _input.MoveInput;
 
         private void Awake()
         {
@@ -94,6 +98,8 @@ namespace Nordo.Player
                 _input.EnableGameplayInput();
                 _input.JumpPerformed += OnJumpPerformed;
             }
+
+            EventBus<ControlLockEvent>.Subscribe(OnControlLock);
         }
 
         private void OnDisable()
@@ -102,7 +108,11 @@ namespace Nordo.Player
             {
                 _input.JumpPerformed -= OnJumpPerformed;
             }
+
+            EventBus<ControlLockEvent>.Unsubscribe(OnControlLock);
         }
+
+        private void OnControlLock(ControlLockEvent evt) => _controlLocked = evt.Locked;
 
         private void Update()
         {
@@ -215,16 +225,17 @@ namespace Nordo.Player
         /// <summary>True when the player is holding sprint, moving forward-ish, upright, and has stamina.</summary>
         private bool IsTryingToSprint()
         {
-            return _input.SprintHeld
+            return !_controlLocked
+                   && _input.SprintHeld
                    && Stamina > 0f
                    && !_input.CrouchHeld
-                   && _input.MoveInput.sqrMagnitude > 0.01f;
+                   && EffectiveMoveInput.sqrMagnitude > 0.01f;
         }
 
         /// <summary>Computes the smoothed horizontal velocity for this frame in world space.</summary>
         private Vector3 ComputeHorizontalVelocity(float dt)
         {
-            Vector2 move = Vector2.ClampMagnitude(_input.MoveInput, 1f);
+            Vector2 move = Vector2.ClampMagnitude(EffectiveMoveInput, 1f);
             Vector3 wishDir = (transform.right * move.x + transform.forward * move.y);
 
             float targetSpeed = ResolveTargetSpeed();
@@ -262,7 +273,7 @@ namespace Nordo.Player
                 // Keep a small downward force so we hug the ground and register isGrounded reliably.
                 _velocity.y = -_settings.GroundStickForce;
 
-                if (_input != null && ConsumeJumpRequest())
+                if (_input != null && !_controlLocked && ConsumeJumpRequest())
                 {
                     // v = sqrt(2 * g * h) gives the exact launch speed for the desired apex height.
                     _velocity.y = Mathf.Sqrt(2f * _settings.Gravity * _settings.JumpHeight);
@@ -317,7 +328,7 @@ namespace Nordo.Player
 
         private LocomotionStance DetermineStance()
         {
-            bool moving = CurrentSpeed > 0.15f && _input.MoveInput.sqrMagnitude > 0.01f;
+            bool moving = CurrentSpeed > 0.15f && EffectiveMoveInput.sqrMagnitude > 0.01f;
             if (!moving)
             {
                 return LocomotionStance.Idle;

@@ -81,7 +81,8 @@ Assets/
       ├─ CameraFeel/         # asmdef: Nordo.CameraFeel (modular camera-effect stack)
       ├─ Interaction/        # asmdef: Nordo.Interaction
       ├─ Enemy/              # asmdef: Nordo.Enemy
-      ├─ Items/              # asmdef: Nordo.Items
+      ├─ Items/              # asmdef: Nordo.Items         (item definitions & pickup events)
+      ├─ Noise/              # asmdef: Nordo.Noise         (central hearing/propagation service)
       ├─ Puzzles/            # asmdef: Nordo.Puzzles
       ├─ Audio/              # asmdef: Nordo.Audio
       ├─ Save/               # asmdef: Nordo.Save
@@ -139,7 +140,7 @@ Each milestone **must compile and be testable** before the next begins.
 | --- | --- | --- | --- |
 | **M1** | **Core Foundation & First-Person Movement** | Folder/asmdef skeleton, EventBus, bootstrap, Input System asset, walk/look/sprint/crouch/jump, gravity | — |
 | **M2** ✅ | **Camera Feel & Footsteps** | Modular camera-effect stack (head-bob, sway, landing impact, move-tilt), smooth look, surface-aware footsteps with speed-driven cadence, breath + cold-breath hooks | M1 |
-| **M3** | **Interaction & Physics** | `IInteractable`, raycast interactor, doors, drawers, pickups, throwable physics props | M1 |
+| **M3** ✅ | **Interaction & Physics** | `IInteractable` + raycast interactor, prompts, highlight, doors/drawers/cabinets, lockables, item pickups, grab/throw, inspection, physics impact noise, **central NoiseSystem** with propagation + occlusion + priority | M1 |
 | **M4** | **Flashlight & Lighting** | Battery-driven flashlight, dynamic light setup, battery pickups, diegetic charge indicator | M1, M3 |
 | **M5** | **Noise System** | Central `NoiseSystem` service, noise emitters on movement/items/machinery, debug visualizer | M1, M3 |
 | **M6** | **Inventory & Items** | `ItemDefinition` SOs, inventory model, keys/batteries/tools, randomized seeded placement | M1, M3 |
@@ -203,4 +204,21 @@ Footsteps and breathing are **event emitters, not islands**: `FootstepController
 every step/exhale. Audio and cold-breath VFX consume these today; the Milestone-5 noise/AI layer
 will consume the very same events, which is why they carry a stealth `Loudness` already.
 
-*Last updated: Milestone 2.*
+### New in Milestone 3 — interaction framework & the noise system
+
+**Interaction** is a strict interface play. The `PlayerInteractor` depends only on `IInteractable`
+and `IInteractionOverride`; every concrete interactable (Door, Drawer, Cabinet, ItemPickup,
+Grabbable, Inspectable) is a small subclass of `InteractableBase`, and cross-cutting concerns are
+**composed, not inherited** — a `Lockable` component makes anything lockable, a `Highlighter`
+makes anything highlightable. Adding a new interactable or a new hold/inspect-style override never
+touches the interactor. UI is fully decoupled: prompts travel as `InteractionPromptEvent`s.
+
+**Noise** is now a first-class Core service. Emitters (footsteps, thrown props via
+`ImpactNoiseEmitter`, doors, pickups, locked-rattles) raise a `NoiseEvent` carrying a
+`NoiseStimulus` (position, loudness, range, **priority**, kind) — they have **zero** knowledge of
+who hears it. The `NoiseSystem` (registered as `INoiseService`) attenuates each stimulus by
+distance and optional **occlusion** raycast and delivers only perceivable sounds to registered
+`INoiseListener`s. The Milestone-7 enemy will simply subclass `NoiseListenerBase`; the entire
+acoustic-stealth pillar is now standing and testable with the `DebugNoiseListener`.
+
+*Last updated: Milestone 3.*

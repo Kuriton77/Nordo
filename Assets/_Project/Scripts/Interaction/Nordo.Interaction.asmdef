@@ -1,0 +1,20 @@
+{
+    "name": "Nordo.Interaction",
+    "rootNamespace": "Nordo.Interaction",
+    "references": [
+        "Nordo.Core",
+        "Nordo.Input",
+        "Nordo.Items",
+        "Unity.InputSystem",
+        "Unity.TextMeshPro"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
