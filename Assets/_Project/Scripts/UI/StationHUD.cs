@@ -1,9 +1,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using Nordo.Core;
 using Nordo.Core.Events;
 using Nordo.Progression;
+
+// NOTE: EventBus calls below are fully qualified (Nordo.Core.EventBus<T>) after a CS0103 was reported
+// against this file. Full qualification cannot fail name resolution as long as the Nordo.Core asmdef
+// reference exists — which it does — making this file immune to using-directive state.
 
 namespace Nordo.UI
 {
@@ -56,18 +59,18 @@ namespace Nordo.UI
 
         private void OnEnable()
         {
-            EventBus<ObjectiveChangedEvent>.Subscribe(OnObjective);
-            EventBus<GameMessageEvent>.Subscribe(OnMessage);
-            EventBus<NoteReadEvent>.Subscribe(OnNote);
-            EventBus<InteractionPromptEvent>.Subscribe(OnPrompt);
+            Nordo.Core.EventBus<ObjectiveChangedEvent>.Subscribe(OnObjective);
+            Nordo.Core.EventBus<GameMessageEvent>.Subscribe(OnMessage);
+            Nordo.Core.EventBus<NoteReadEvent>.Subscribe(OnNote);
+            Nordo.Core.EventBus<InteractionPromptEvent>.Subscribe(OnPrompt);
         }
 
         private void OnDisable()
         {
-            EventBus<ObjectiveChangedEvent>.Unsubscribe(OnObjective);
-            EventBus<GameMessageEvent>.Unsubscribe(OnMessage);
-            EventBus<NoteReadEvent>.Unsubscribe(OnNote);
-            EventBus<InteractionPromptEvent>.Unsubscribe(OnPrompt);
+            Nordo.Core.EventBus<ObjectiveChangedEvent>.Unsubscribe(OnObjective);
+            Nordo.Core.EventBus<GameMessageEvent>.Unsubscribe(OnMessage);
+            Nordo.Core.EventBus<NoteReadEvent>.Unsubscribe(OnNote);
+            Nordo.Core.EventBus<InteractionPromptEvent>.Unsubscribe(OnPrompt);
         }
 
         private void Update()

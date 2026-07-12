@@ -1,26 +1,28 @@
 using UnityEngine;
-using UnityEngine.Rendering; // LightShadowResolution
 
 namespace Nordo.Lighting
 {
     /// <summary>
-    /// A reusable quality preset applied to a Unity <see cref="Light"/>: shadow type/strength/resolution,
-    /// render mode, and a volumetric hint. Author Low/Medium/High assets and switch them from a graphics
+    /// A reusable quality preset applied to a Unity <see cref="Light"/>: shadow type/strength, render
+    /// mode, and a volumetric hint. Author Low/Medium/High assets and switch them from a graphics
     /// settings menu (Milestone 11) to scale visual cost — the flashlight applies whichever it's given.
-    /// This keeps "light quality presets" as data, not branching code.
+    /// <para>
+    /// Per-light shadow-map <b>resolution</b> is deliberately not part of the preset: that knob
+    /// (<c>Light.shadowResolution</c>) belongs to the legacy Built-in pipeline and is ignored by URP,
+    /// which takes shadow resolution from the pipeline asset
+    /// (<c>Assets/_Project/Settings/URP/Nordo_URP_Pipeline</c>). Dropping it keeps this preset
+    /// pipeline-correct for Unity 2022.3 + URP and removes a Built-in-only API dependency.
+    /// </para>
     /// </summary>
     [CreateAssetMenu(menuName = "Nordo/Lighting/Light Quality Preset", fileName = "LightQuality_")]
     public sealed class LightQualityPreset : ScriptableObject
     {
         [Header("Shadows")]
-        [Tooltip("Shadow type cast by the light.")]
-        [SerializeField] private LightShadows _shadows = LightShadows.Soft;
+        [Tooltip("Shadow type cast by the light. Hard shadows are the art-direction default.")]
+        [SerializeField] private LightShadows _shadows = LightShadows.Hard;
 
         [Tooltip("Shadow darkness, 0 (none) to 1 (black).")]
         [Range(0f, 1f)] [SerializeField] private float _shadowStrength = 0.85f;
-
-        [Tooltip("Per-light shadow map resolution.")]
-        [SerializeField] private LightShadowResolution _shadowResolution = LightShadowResolution.FromQualitySettings;
 
         [Header("Rendering")]
         [Tooltip("Pixel (Important) vs. vertex/baked (Auto) — Important gives per-pixel shadows and cone.")]
@@ -43,7 +45,6 @@ namespace Nordo.Lighting
 
             light.shadows = _shadows;
             light.shadowStrength = _shadowStrength;
-            light.shadowResolution = _shadowResolution;
             light.renderMode = _renderMode;
         }
     }
