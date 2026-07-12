@@ -17,7 +17,7 @@ namespace Nordo.Player
     /// </summary>
     [RequireComponent(typeof(CharacterController))]
     [DisallowMultipleComponent]
-    public sealed class FirstPersonMotor : MonoBehaviour
+    public sealed class FirstPersonMotor : MonoBehaviour, ILocomotionState
     {
         [Header("References")]
         [Tooltip("Shared input asset. Assign the same InputReader used by PlayerLook.")]
@@ -48,6 +48,14 @@ namespace Nordo.Player
 
         /// <summary>Current horizontal speed in metres/second.</summary>
         public float CurrentSpeed => new Vector2(_velocity.x, _velocity.z).magnitude;
+
+        /// <summary>Horizontal speed as a 0–1 fraction of sprint speed (clamped).</summary>
+        public float NormalizedPlanarSpeed => _settings != null && _settings.SprintSpeed > 0f
+            ? Mathf.Clamp01(CurrentSpeed / _settings.SprintSpeed)
+            : 0f;
+
+        /// <summary>Raw movement intent this frame (X = strafe, Y = forward).</summary>
+        public Vector2 MoveInput => _input != null ? _input.MoveInput : Vector2.zero;
 
         /// <summary>True when the controller is on the ground this frame.</summary>
         public bool IsGrounded { get; private set; }

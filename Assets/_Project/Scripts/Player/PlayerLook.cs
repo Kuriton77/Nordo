@@ -31,6 +31,11 @@ namespace Nordo.Player
         [Tooltip("Invert the vertical look axis (flight-sim style).")]
         [SerializeField] private bool _invertY;
 
+        [Header("Smoothing")]
+        [Tooltip("Seconds over which raw look input is smoothed. 0 = fully raw/instant (competitive feel); " +
+                 "small values (~0.03–0.06) remove mouse jitter for a filmic feel. High-DPI mice benefit from a touch.")]
+        [Range(0f, 0.2f)] [SerializeField] private float _smoothingTime = 0.02f;
+
         [Header("Constraints")]
         [Tooltip("Lowest the camera can look (degrees below horizon).")]
         [Range(-90f, 0f)] [SerializeField] private float _minPitch = -85f;
@@ -39,6 +44,8 @@ namespace Nordo.Player
         [Range(0f, 90f)] [SerializeField] private float _maxPitch = 85f;
 
         private float _pitch;
+        private Vector2 _smoothedLook;
+        private Vector2 _smoothVelocity;
 
         private void Reset()
         {
@@ -64,7 +71,19 @@ namespace Nordo.Player
                 return;
             }
 
-            Vector2 look = _input.LookInput;
+            // Smooth the raw look delta toward its target to shave off mouse jitter without
+            // adding perceptible latency. At _smoothingTime == 0 this passes input straight through.
+            Vector2 rawLook = _input.LookInput;
+            Vector2 look;
+            if (_smoothingTime > 0f)
+            {
+                _smoothedLook = Vector2.SmoothDamp(_smoothedLook, rawLook, ref _smoothVelocity, _smoothingTime, Mathf.Infinity, Time.unscaledDeltaTime);
+                look = _smoothedLook;
+            }
+            else
+            {
+                look = rawLook;
+            }
 
             // Yaw: rotate the body around the world-up axis.
             float yawDelta = look.x * _horizontalSensitivity;

@@ -17,14 +17,22 @@ namespace Nordo.Game
     public sealed class GameBootstrapper : MonoBehaviour
     {
         [Header("Diagnostics")]
-        [Tooltip("Log player locomotion events to the console. Handy while validating Milestone 1; turn off for release.")]
+        [Tooltip("Log player locomotion events (jump/land/stance) to the console. For validating Milestones 1–2.")]
         [SerializeField] private bool _logLocomotionEvents = true;
+
+        [Tooltip("Log footstep events (surface + loudness). Verbose — useful when tuning the footstep system.")]
+        [SerializeField] private bool _logFootsteps;
+
+        [Tooltip("Log breath exhale events. Verbose — useful when tuning the breath system.")]
+        [SerializeField] private bool _logBreaths;
 
         private void OnEnable()
         {
             EventBus<PlayerJumpedEvent>.Subscribe(OnPlayerJumped);
             EventBus<PlayerLandedEvent>.Subscribe(OnPlayerLanded);
             EventBus<PlayerStanceChangedEvent>.Subscribe(OnStanceChanged);
+            EventBus<FootstepEvent>.Subscribe(OnFootstep);
+            EventBus<BreathEvent>.Subscribe(OnBreath);
         }
 
         private void OnDisable()
@@ -32,6 +40,8 @@ namespace Nordo.Game
             EventBus<PlayerJumpedEvent>.Unsubscribe(OnPlayerJumped);
             EventBus<PlayerLandedEvent>.Unsubscribe(OnPlayerLanded);
             EventBus<PlayerStanceChangedEvent>.Unsubscribe(OnStanceChanged);
+            EventBus<FootstepEvent>.Unsubscribe(OnFootstep);
+            EventBus<BreathEvent>.Unsubscribe(OnBreath);
         }
 
         private void OnPlayerJumped(PlayerJumpedEvent evt)
@@ -55,6 +65,22 @@ namespace Nordo.Game
             if (_logLocomotionEvents)
             {
                 Debug.Log($"[Nordo] Stance -> {evt.Stance}.");
+            }
+        }
+
+        private void OnFootstep(FootstepEvent evt)
+        {
+            if (_logFootsteps)
+            {
+                Debug.Log($"[Nordo] Footstep on {evt.Surface} ({evt.Stance}) loudness {evt.Loudness:0.00} at {evt.Position}.");
+            }
+        }
+
+        private void OnBreath(BreathEvent evt)
+        {
+            if (_logBreaths && evt.IsExhale)
+            {
+                Debug.Log($"[Nordo] Exhale (intensity {evt.Intensity:0.00}).");
             }
         }
     }

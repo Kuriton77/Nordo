@@ -3,6 +3,7 @@
     "rootNamespace": "Nordo.Tests",
     "references": [
         "Nordo.Core",
+        "Nordo.CameraFeel",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner"
     ],

@@ -78,6 +78,7 @@ Assets/
       ├─ Core/               # asmdef: Nordo.Core     (no game deps)
       ├─ Input/              # asmdef: Nordo.Input
       ├─ Player/             # asmdef: Nordo.Player
+      ├─ CameraFeel/         # asmdef: Nordo.CameraFeel (modular camera-effect stack)
       ├─ Interaction/        # asmdef: Nordo.Interaction
       ├─ Enemy/              # asmdef: Nordo.Enemy
       ├─ Items/              # asmdef: Nordo.Items
@@ -137,7 +138,7 @@ Each milestone **must compile and be testable** before the next begins.
 | # | Milestone | Delivers | Depends on |
 | --- | --- | --- | --- |
 | **M1** | **Core Foundation & First-Person Movement** | Folder/asmdef skeleton, EventBus, bootstrap, Input System asset, walk/look/sprint/crouch/jump, gravity | — |
-| **M2** | **Camera Feel & Footsteps** | Head-bob, footstep audio by surface, breath/cold fog hooks, stamina | M1 |
+| **M2** ✅ | **Camera Feel & Footsteps** | Modular camera-effect stack (head-bob, sway, landing impact, move-tilt), smooth look, surface-aware footsteps with speed-driven cadence, breath + cold-breath hooks | M1 |
 | **M3** | **Interaction & Physics** | `IInteractable`, raycast interactor, doors, drawers, pickups, throwable physics props | M1 |
 | **M4** | **Flashlight & Lighting** | Battery-driven flashlight, dynamic light setup, battery pickups, diegetic charge indicator | M1, M3 |
 | **M5** | **Noise System** | Central `NoiseSystem` service, noise emitters on movement/items/machinery, debug visualizer | M1, M3 |
@@ -188,4 +189,18 @@ Each milestone **must compile and be testable** before the next begins.
 
 ---
 
-*Last updated: Milestone 1.*
+### New in Milestone 2 — the camera-effect stack pattern
+
+The camera feel is built as an **additive effect stack** (Open/Closed principle): `CameraRig`
+discovers every `ICameraEffect` component on its GameObject, sums each one's
+`CameraEffectSample` (a local position + Euler offset), smooths the total, and applies it to the
+camera-effects transform. Adding a new camera behaviour is just attaching another component — no
+rig changes. Effects read player state through the Core-level `ILocomotionState` interface, never
+the concrete motor, keeping `Nordo.CameraFeel` dependent only on `Nordo.Core`.
+
+Footsteps and breathing are **event emitters, not islands**: `FootstepController` raises a
+`FootstepEvent` (position + surface + loudness) and `BreathController` raises a `BreathEvent` on
+every step/exhale. Audio and cold-breath VFX consume these today; the Milestone-5 noise/AI layer
+will consume the very same events, which is why they carry a stealth `Loudness` already.
+
+*Last updated: Milestone 2.*
