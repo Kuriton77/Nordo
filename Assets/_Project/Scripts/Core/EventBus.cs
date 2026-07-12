@@ -83,8 +83,12 @@ namespace Nordo.Core
             }
         }
 
-        /// <summary>Drops every subscriber for this event type. Called on domain reset.</summary>
-        internal static void Clear()
+        /// <summary>
+        /// Drops every subscriber for this event type. Public so the EditMode tests (a separate
+        /// assembly) and hard-reset flows can restore a clean bus; domain resets also call it via
+        /// <see cref="EventBusRegistry"/>.
+        /// </summary>
+        public static void Clear()
         {
             _handlers = null;
         }

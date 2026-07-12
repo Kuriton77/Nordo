@@ -41,11 +41,14 @@ Nordo/
 
 ## Notes
 
-- **Render pipeline:** the project opens on the **Built-in** pipeline by default; the runtime level
-  builders detect the active pipeline and use Built-in-compatible materials, so nothing renders
-  magenta. To get the full **PSX look** (`Nordo/PSX` shader), create a URP asset
-  (*Assets → Create → Rendering → URP Asset*) and assign it in *Project Settings → Graphics* and
-  *Quality*. Fog and the cold palette work under both pipelines (they're driven by `SceneAtmosphere`).
+- **Render pipeline:** on first load an editor bootstrap (`UrpAutoSetup`) automatically creates
+  `Assets/_Project/Settings/URP/` pipeline assets and assigns them, activating the locked
+  **`Nordo/PSX`** art-direction shader — no manual step. (If a pipeline is already assigned it does
+  nothing.) The runtime builders also detect the active pipeline and fall back to Built-in-safe
+  materials, so nothing ever renders magenta.
+- **After your first editor session, commit the Unity-generated `.meta` files** (plus the updated
+  `ProjectSettings/GraphicsSettings.asset` and the `Settings/URP/` assets). Metas pin asset GUIDs so
+  they stay stable for every future clone.
 - **Input:** the New Input System is enabled (`activeInputHandler: 2`), so no "enable backends" prompt.
 - **Providing your own player:** turn off *Build Player Rig* on `GameBootstrap` and place your own
   `Player`-tagged rig with a `CharacterController` in the scene instead.

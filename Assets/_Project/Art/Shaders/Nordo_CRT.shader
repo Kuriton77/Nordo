@@ -28,7 +28,7 @@ Shader "Nordo/CRT"
             #pragma fragment frag
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Blit.hlsl"
+            #include "Packages/com.unity.render-pipelines.core/Runtime/Utilities/Blit.hlsl"
 
             float _Curvature;
             float _Vignette;
@@ -61,7 +61,9 @@ Shader "Nordo/CRT"
 
             half4 frag (Varyings input) : SV_Target
             {
-                float2 uv = CurveUV(input.texcoord, out float mask);
+                // HLSL requires the out-argument to be declared before the call (no C#-style inline out).
+                float mask;
+                float2 uv = CurveUV(input.texcoord, mask);
 
                 // Chromatic aberration: sample RGB at slightly offset UVs.
                 float2 dir = uv - 0.5;
