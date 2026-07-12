@@ -67,6 +67,16 @@ namespace Nordo.Input
         private bool _initialized;
 
         /// <summary>
+        /// Assigns the backing <see cref="InputActionAsset"/> at runtime (used by the bootstrap, which
+        /// builds the controls in code). Re-initialises on the next enable.
+        /// </summary>
+        public void SetActions(InputActionAsset actions)
+        {
+            _actions = actions;
+            _initialized = false;
+        }
+
+        /// <summary>
         /// Resolves and hooks all action callbacks, then enables the gameplay map.
         /// Safe to call multiple times — initialization only happens once.
         /// </summary>

@@ -39,6 +39,7 @@ It shares only a genre with other horror titles — nothing else.
 | --- | --- |
 | [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | System architecture, folder structure, roadmap, milestones, dependency graph, build order |
 | [`docs/ART_DIRECTION.md`](docs/ART_DIRECTION.md) | **LOCKED** art direction — modern PSX horror; binding on all visuals |
+| [`docs/PROJECT_SETUP.md`](docs/PROJECT_SETUP.md) | How to open the project in Unity & how the startup scene boots |
 | [`docs/MILESTONE-01.md`](docs/MILESTONE-01.md) | Milestone 1 — Core foundation & first-person movement (test guide) |
 | [`docs/MILESTONE-02.md`](docs/MILESTONE-02.md) | Milestone 2 — Camera feel & footsteps (test guide) |
 | [`docs/MILESTONE-03.md`](docs/MILESTONE-03.md) | Milestone 3 — Interaction framework & noise system (test guide) |
@@ -57,9 +58,18 @@ Nordo/
 └─ docs/               # Design & engineering documentation
 ```
 
+## Open & play (it's a complete Unity project)
+
+1. Clone the repo and **Add** it in Unity Hub (or open the folder) — Hub detects it via
+   `ProjectSettings/ProjectVersion.txt` and opens it with **Unity 2022.3 LTS**.
+2. Open **`Assets/_Project/Scenes/Bootstrap.unity`** (already in Build Settings) and press **Play** —
+   the player rig and the first Vardø-9 section build themselves. No manual setup.
+
+Full details in **[`docs/PROJECT_SETUP.md`](docs/PROJECT_SETUP.md)**.
+
 ## Requirements
 
-- Unity **2022.3 LTS** (or newer LTS)
+- Unity **2022.3 LTS** (any `2022.3.x` patch)
 - Packages resolved automatically from `Packages/manifest.json`
 
 ## Status

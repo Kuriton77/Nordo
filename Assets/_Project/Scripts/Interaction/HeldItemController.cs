@@ -23,6 +23,13 @@ namespace Nordo.Interaction
         [Tooltip("Camera used to aim throws. If empty, a child camera is used.")]
         [SerializeField] private Camera _camera;
 
+        /// <summary>Runtime wiring (used by the bootstrap; call before the object is activated).</summary>
+        public void Configure(Transform holdAnchor, Camera camera)
+        {
+            _holdAnchor = holdAnchor;
+            _camera = camera;
+        }
+
         [Tooltip("How snappily the held object follows the anchor (higher = stiffer).")]
         [Range(2f, 40f)] [SerializeField] private float _followSharpness = 18f;
 

@@ -18,6 +18,9 @@ namespace Nordo.Player
         [Tooltip("Lock and hide the hardware cursor while playing.")]
         [SerializeField] private bool _lockCursorOnStart = true;
 
+        /// <summary>Runtime wiring (used by the bootstrap; call before the object is activated).</summary>
+        public void SetInput(InputReader input) => _input = input;
+
         /// <summary>Whether the game is currently paused. Exposed for other systems (menus, HUD).</summary>
         public bool IsPaused { get; private set; }
 

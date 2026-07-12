@@ -302,11 +302,13 @@ namespace Nordo.VerticalSlice
             _exitMat = MakeMaterial(p.SicklyTeal); // a cold teal "safe" signal, still in-palette
         }
 
-        // Prefers the locked Nordo/PSX shader; falls back gracefully if it hasn't imported yet.
+        // Picks a shader that actually renders under the active pipeline: the locked Nordo/PSX (URP)
+        // when URP is active, else the Built-in Standard shader — so the greybox is never magenta.
         private static Material MakeMaterial(Color color)
         {
-            Shader shader = Shader.Find("Nordo/PSX");
-            if (shader == null)
+            bool urpActive = UnityEngine.Rendering.GraphicsSettings.currentRenderPipeline != null;
+            Shader shader = urpActive ? Shader.Find("Nordo/PSX") : null;
+            if (shader == null && urpActive)
             {
                 shader = Shader.Find("Universal Render Pipeline/Lit");
             }

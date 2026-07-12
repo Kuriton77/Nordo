@@ -27,6 +27,13 @@ namespace Nordo.Interaction
         [Tooltip("Shared input asset providing the Interact action.")]
         [SerializeField] private InputReader _input;
 
+        /// <summary>Runtime wiring (used by the bootstrap; call before the object is activated).</summary>
+        public void Configure(InputReader input, Camera camera)
+        {
+            _input = input;
+            _camera = camera;
+        }
+
         [Header("Ray")]
         [Tooltip("Maximum interaction distance in metres.")]
         [Range(0.5f, 6f)] [SerializeField] private float _range = 2.6f;

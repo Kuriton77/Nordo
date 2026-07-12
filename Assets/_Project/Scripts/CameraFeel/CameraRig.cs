@@ -37,6 +37,13 @@ namespace Nordo.CameraFeel
         [Tooltip("Transform that pitches with aiming (the camera pivot). Optional.")]
         [SerializeField] private Transform _pitchSource;
 
+        /// <summary>Runtime wiring of the aim sources for look-sway (used by the bootstrap).</summary>
+        public void SetAimSources(Transform yawSource, Transform pitchSource)
+        {
+            _yawSource = yawSource;
+            _pitchSource = pitchSource;
+        }
+
         [Header("Smoothing")]
         [Tooltip("Response time for positional offsets. Smaller = snappier, larger = floatier.")]
         [Range(0f, 0.3f)] [SerializeField] private float _positionSmoothTime = 0.05f;

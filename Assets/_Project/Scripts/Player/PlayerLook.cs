@@ -23,6 +23,13 @@ namespace Nordo.Player
         [Tooltip("The transform rotated for pitch (up/down). Usually the camera pivot / holder.")]
         [SerializeField] private Transform _cameraPivot;
 
+        /// <summary>Runtime wiring (used by the bootstrap; call before the object is activated).</summary>
+        public void Configure(InputReader input, Transform cameraPivot)
+        {
+            _input = input;
+            _cameraPivot = cameraPivot;
+        }
+
         [Header("Sensitivity")]
         [Tooltip("Degrees of rotation per unit of look input, horizontal.")]
         [Range(0.01f, 1f)] [SerializeField] private float _horizontalSensitivity = 0.12f;

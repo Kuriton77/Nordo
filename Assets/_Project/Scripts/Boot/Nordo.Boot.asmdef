@@ -1,0 +1,24 @@
+{
+    "name": "Nordo.Boot",
+    "rootNamespace": "Nordo.Boot",
+    "references": [
+        "Nordo.Input",
+        "Nordo.Player",
+        "Nordo.CameraFeel",
+        "Nordo.Lighting",
+        "Nordo.Audio",
+        "Nordo.Noise",
+        "Nordo.Interaction",
+        "Nordo.Level",
+        "Unity.InputSystem"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

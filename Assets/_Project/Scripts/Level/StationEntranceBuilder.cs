@@ -440,8 +440,10 @@ namespace Nordo.Level
 
         private static Material MakeMaterial(Color color)
         {
-            Shader shader = Shader.Find("Nordo/PSX");
-            if (shader == null) shader = Shader.Find("Universal Render Pipeline/Lit");
+            // Render under whichever pipeline is active: Nordo/PSX (URP) or Built-in Standard.
+            bool urpActive = UnityEngine.Rendering.GraphicsSettings.currentRenderPipeline != null;
+            Shader shader = urpActive ? Shader.Find("Nordo/PSX") : null;
+            if (shader == null && urpActive) shader = Shader.Find("Universal Render Pipeline/Lit");
             if (shader == null) shader = Shader.Find("Standard");
 
             var material = new Material(shader);

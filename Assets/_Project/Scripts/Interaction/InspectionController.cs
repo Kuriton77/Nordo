@@ -25,6 +25,13 @@ namespace Nordo.Interaction
         [Tooltip("Shared input asset; its look axis rotates the inspected object.")]
         [SerializeField] private InputReader _input;
 
+        /// <summary>Runtime wiring (used by the bootstrap; call before the object is activated).</summary>
+        public void Configure(InputReader input, Camera camera)
+        {
+            _input = input;
+            _camera = camera;
+        }
+
         [Header("Feel")]
         [Tooltip("Degrees of object rotation per unit of look input.")]
         [Range(0.02f, 1f)] [SerializeField] private float _rotateSpeed = 0.25f;

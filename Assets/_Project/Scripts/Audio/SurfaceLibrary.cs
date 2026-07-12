@@ -41,6 +41,13 @@ namespace Nordo.Audio
         /// <summary>The guaranteed fallback surface.</summary>
         public SurfaceDefinition Default => _default;
 
+        /// <summary>Runtime wiring of the fallback surface (used by the bootstrap).</summary>
+        public void SetDefaultSurface(SurfaceDefinition surface)
+        {
+            _default = surface;
+            _materialLookup = null;
+        }
+
         /// <summary>
         /// Resolves the surface for a raycast hit against the floor.
         /// Never returns null unless the default is unassigned (which is logged).

@@ -26,6 +26,13 @@ namespace Nordo.Player
         [Tooltip("Tuning data for speeds, crouch, jump and stamina.")]
         [SerializeField] private MovementSettings _settings;
 
+        /// <summary>Runtime wiring (used by the bootstrap; call before the object is activated).</summary>
+        public void Configure(InputReader input, MovementSettings settings)
+        {
+            _input = input;
+            _settings = settings;
+        }
+
         [Header("Ground Check")]
         [Tooltip("Extra downward probe distance beyond the controller's own grounded flag, for coyote-style reliability.")]
         [Range(0f, 0.5f)] [SerializeField] private float _groundProbeDistance = 0.12f;

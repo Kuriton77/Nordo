@@ -36,6 +36,14 @@ namespace Nordo.Lighting
         [Tooltip("Optional shadow/render quality preset applied to the light on start.")]
         [SerializeField] private LightQualityPreset _qualityPreset;
 
+        /// <summary>Runtime wiring (used by the bootstrap; call before the object is activated).</summary>
+        public void Configure(InputReader input, Light light, FlashlightSettings settings)
+        {
+            _input = input;
+            _light = light;
+            _settings = settings;
+        }
+
         [Header("Battery")]
         [SerializeField] private Battery _battery = new Battery();
 

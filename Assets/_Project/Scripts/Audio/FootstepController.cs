@@ -25,6 +25,9 @@ namespace Nordo.Audio
         [Tooltip("Library that maps what the player stands on to a SurfaceDefinition.")]
         [SerializeField] private SurfaceLibrary _surfaceLibrary;
 
+        /// <summary>Runtime wiring (used by the bootstrap; call before the object is activated).</summary>
+        public void SetSurfaceLibrary(SurfaceLibrary library) => _surfaceLibrary = library;
+
         [Header("Audio")]
         [Tooltip("AudioSource used for footsteps. If empty, a 3D source is created at runtime.")]
         [SerializeField] private AudioSource _audioSource;
