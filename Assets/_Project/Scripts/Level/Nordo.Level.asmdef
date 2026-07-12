@@ -1,0 +1,25 @@
+{
+    "name": "Nordo.Level",
+    "rootNamespace": "Nordo.Level",
+    "references": [
+        "Nordo.Core",
+        "Nordo.Noise",
+        "Nordo.Enemy",
+        "Nordo.Interaction",
+        "Nordo.Lighting",
+        "Nordo.Items",
+        "Nordo.Progression",
+        "Nordo.UI",
+        "Nordo.Rendering",
+        "Unity.AI.Navigation"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

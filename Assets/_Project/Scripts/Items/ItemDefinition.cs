@@ -84,5 +84,22 @@ namespace Nordo.Items
 
         /// <summary>Prefab used when dropping the item into the world.</summary>
         public GameObject WorldPrefab => _worldPrefab;
+
+        /// <summary>
+        /// Creates a fully-configured definition at runtime (used by builders/tests that author items
+        /// in code rather than as project assets). Prefer authored assets for shipping content.
+        /// </summary>
+        public static ItemDefinition CreateRuntime(string id, string displayName, string description,
+            ItemCategory category, float weight = 0.5f)
+        {
+            var def = CreateInstance<ItemDefinition>();
+            def._id = id;
+            def._displayName = displayName;
+            def._description = description;
+            def._category = category;
+            def._weight = weight;
+            def.name = $"Item_{id}";
+            return def;
+        }
     }
 }

@@ -85,6 +85,9 @@ Assets/
       ├─ Enemy/              # asmdef: Nordo.Enemy
       ├─ Items/              # asmdef: Nordo.Items         (item definitions & pickup events)
       ├─ Noise/              # asmdef: Nordo.Noise         (central hearing/propagation service)
+      ├─ Progression/        # asmdef: Nordo.Progression   (inventory, objectives, power, fuse/generator, notes)
+      ├─ UI/                 # asmdef: Nordo.UI            (station HUD, inventory, logbook)
+      ├─ Level/              # asmdef: Nordo.Level         (the Vardø-9 section builder + director)
       ├─ Puzzles/            # asmdef: Nordo.Puzzles
       ├─ Audio/              # asmdef: Nordo.Audio
       ├─ Save/               # asmdef: Nordo.Save
@@ -146,9 +149,9 @@ Each milestone **must compile and be testable** before the next begins.
 | **M3** ✅ | **Interaction & Physics** | `IInteractable` + raycast interactor, prompts, highlight, doors/drawers/cabinets, lockables, item pickups, grab/throw, inspection, physics impact noise, **central NoiseSystem** with propagation + occlusion + priority | M1 |
 | **M4** ✅ | **Flashlight & Lighting** | Battery model + flashlight, modular flicker/instability/low-battery/emergency modulators, quality presets, volumetric-beam support, diegetic indicator, battery pickups (item-integrated), save state, **light-visibility service (AI hook)** | M1, M3 |
 | **M5** ✅ | **Noise System** | Single-channel `NoiseSystem` (multi-occluder + curve falloff, non-alloc), `PlayerNoiseEmitter`, `Periodic`/`Machine` emitters, propagation visualizer, extracted+tested `NoiseAttenuation`, stress tester | M1, M3 |
-| **M6** | **Inventory & Items** | `ItemDefinition` SOs, inventory model, keys/batteries/tools, randomized seeded placement | M1, M3 |
+| **M6** ✅ | **Inventory & Items** *(delivered in vertical-slice M7)* | `ItemDefinition` SOs, `InventoryService` (`IInventory`), keys/fuses/batteries, pickup→inventory flow | M1, M3 |
 | **M7** ✅ | **Enemy AI — The Listener** *(shipped as the vertical-slice "Milestone 6")* | Blind, hearing-only FSM (Patrol→Investigate→Search→Chase→Attack→Lose→Return), suspicion + memory, NavMesh nav, AI door-opening, animator/audio hooks, difficulty config, debug gizmos, and a runtime-built playable test area | M1, M5, M2 |
-| **M8** | **Puzzle Systems** | Fuse boxes, generators, combination locks, keyed doors, hidden passages, environmental story | M3, M6 |
+| **M8** 🟡 | **Puzzle Systems** *(core delivered in M7)* | ✅ fuse boxes, generators, power grid, keyed/powered locked doors, objective chain, readable notes; ⬜ combination locks, hidden passages | M3, M6 |
 | **M9** | **Save / Load** | JSON save service, scene state serialization, checkpoint & manual saves | M1, M6, M8 |
 | **M10** | **Difficulty & Endings** | Difficulty SO curves, ending resolver, station-wide state machine | M7, M8, M9 |
 | **M11** | **UI / UX & Menus** | Main menu, pause, settings, diegetic prompts, options persistence | M1, M9 |
@@ -289,4 +292,26 @@ props, a hiding nook, the patrolling Listener, an exit, and an objective HUD), b
 wires a caught/escape loop — so the whole hunt can be played by dropping one component into an empty
 scene alongside the existing player rig.
 
-*Last updated: Milestone 6 (The Listener).*
+### New in Milestone 7 — inventory, objectives, puzzle progression & the first section
+
+The vertical slice becomes **finishable**. Three concerns join the graph, all event-driven:
+
+- **Progression** (`Nordo.Progression`): `InventoryService` (implements the Core `IInventory` so locked
+  doors/fuse boxes can consult it), `ObjectiveTracker` (multi-stage chain via the Core
+  `IObjectiveService`), a `PowerController`/`PoweredDevice` grid (powered lights + powered locks), and
+  the puzzle interactables `FuseBox`, `Generator` (drives `MachineNoiseEmitter` — restoring power is
+  your loudest moment), and `ReadableNote`. `Lockable` now auto-unlocks from the inventory (keys), so
+  the whole key→door→fuse→generator→power→exit dependency chain is real and interconnected.
+- **UI** (`Nordo.UI`): `StationHUD` — objective tracker, inventory, interaction prompt, feedback
+  toasts, a modal note reader, and a toggleable field logbook — all fed purely by events/services, so
+  it is swappable for a diegetic world-space UI later without touching gameplay.
+- **Level** (`Nordo.Level`): `StationEntranceBuilder` constructs the first designed section of Vardø-9
+  at runtime (entry → hall → offices/storage → locked control room → powered transmitter exit) to the
+  **locked PSX art direction**, bakes a NavMesh whose doors *carve dynamically* (a locked room keeps
+  The Listener out until opened), places the key/fuse/notes and the full puzzle chain, and wires the
+  caught/escape loop. It is a designed section, not a test map.
+
+Everything integrates with The Listener (the generator draws it; locked doors gate it) and the
+acoustic system (fuse clunks, generator roar, door operation all emit on the one noise channel).
+
+*Last updated: Milestone 7 (inventory, objectives & the first section).*

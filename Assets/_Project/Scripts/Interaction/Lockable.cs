@@ -24,6 +24,9 @@ namespace Nordo.Interaction
         [Tooltip("Prompt shown while locked.")]
         [SerializeField] private string _lockedPrompt = "Locked";
 
+        [Tooltip("Consume the key from the inventory when it opens this lock.")]
+        [SerializeField] private bool _consumeKey = true;
+
         [Header("Feedback")]
         [SerializeField] private AudioSource _audioSource;
         [SerializeField] private AudioClip _lockedRattle;
@@ -63,6 +66,51 @@ namespace Nordo.Interaction
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Attempts to open this lock using the player's inventory: if a required key is present it is
+        /// (optionally) consumed and the lock opens. Returns true if the object is now unlocked.
+        /// Called automatically by <see cref="InteractableBase"/> before reporting "Locked".
+        /// </summary>
+        public bool TryAutoUnlock()
+        {
+            if (!_isLocked)
+            {
+                return true;
+            }
+
+            // A lock with no key id is script/puzzle-only and cannot be opened from the inventory.
+            if (string.IsNullOrEmpty(_requiredKeyId))
+            {
+                return false;
+            }
+
+            if (!ServiceLocator.TryGet(out IInventory inventory) || inventory == null)
+            {
+                return false;
+            }
+
+            if (!inventory.Has(_requiredKeyId))
+            {
+                return false;
+            }
+
+            if (_consumeKey)
+            {
+                inventory.TryRemove(_requiredKeyId, 1);
+            }
+
+            Unlock();
+            return true;
+        }
+
+        /// <summary>Configures the lock at runtime (used by the level builder).</summary>
+        public void Configure(bool isLocked, string requiredKeyId, bool consumeKey = true)
+        {
+            _isLocked = isLocked;
+            _requiredKeyId = requiredKeyId;
+            _consumeKey = consumeKey;
         }
 
         /// <summary>Unlocks unconditionally (e.g. a puzzle solving itself). Idempotent.</summary>

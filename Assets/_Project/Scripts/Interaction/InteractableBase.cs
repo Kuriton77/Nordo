@@ -77,11 +77,16 @@ namespace Nordo.Interaction
                 return;
             }
 
-            // A locked object consumes the interaction as a "rattle" and does nothing else.
+            // A locked object first tries to open from the inventory (the right key). If that fails,
+            // the interaction is consumed as a "rattle" (audible to The Listener) and nothing else happens.
             if (IsLocked)
             {
-                _lockable.NotifyLocked();
-                return;
+                if (!_lockable.TryAutoUnlock())
+                {
+                    _lockable.NotifyLocked();
+                    return;
+                }
+                // Unlocked this frame — fall through so the same press also opens the door.
             }
 
             OnInteract(context);

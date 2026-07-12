@@ -1,0 +1,19 @@
+{
+    "name": "Nordo.UI",
+    "rootNamespace": "Nordo.UI",
+    "references": [
+        "Nordo.Core",
+        "Nordo.Items",
+        "Nordo.Progression",
+        "Unity.InputSystem"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
