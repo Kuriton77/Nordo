@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Nordo.Core;
 using Nordo.Core.Events;
 using Nordo.Progression;
 

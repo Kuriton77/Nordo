@@ -1,4 +1,5 @@
 using UnityEngine;
+using Nordo.Core;
 using Nordo.Core.Events;
 using Nordo.Enemy;
 
