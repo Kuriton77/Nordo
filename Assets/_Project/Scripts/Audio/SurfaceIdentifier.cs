@@ -16,5 +16,8 @@ namespace Nordo.Audio
 
         /// <summary>The surface this collider represents. May be null if left unassigned.</summary>
         public SurfaceDefinition Surface => _surface;
+
+        /// <summary>Runtime wiring (used by the level builder).</summary>
+        public void SetSurface(SurfaceDefinition surface) => _surface = surface;
     }
 }

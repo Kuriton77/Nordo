@@ -76,9 +76,14 @@ namespace Nordo.Boot
             player.AddComponent<HeldItemController>().Configure(holdAnchor, camera);
             player.AddComponent<InspectionController>().Configure(reader, camera);
 
-            // --- Footsteps (a default surface so steps make noise even with no audio clips) ---
+            // --- Footsteps: audible, surface-aware. Concrete scuffs by default; the level's metal
+            // floors override via SurfaceIdentifier. Every step is also a stimulus for The Listener.
             var library = ScriptableObject.CreateInstance<SurfaceLibrary>();
-            library.SetDefaultSurface(ScriptableObject.CreateInstance<SurfaceDefinition>());
+            library.SetDefaultSurface(SurfaceDefinition.CreateRuntime(
+                Nordo.Core.SurfaceKind.Concrete,
+                Nordo.Audio.ProceduralAudio.FootstepSet(metal: false),
+                new[] { Nordo.Audio.ProceduralAudio.LandThud() },
+                noiseLoudness: 0.6f, baseVolume: 0.55f));
             player.AddComponent<FootstepController>().SetSurfaceLibrary(library);
 
             player.AddComponent<BreathController>();

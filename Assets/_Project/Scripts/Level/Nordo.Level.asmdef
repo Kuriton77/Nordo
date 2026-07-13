@@ -3,6 +3,7 @@
     "rootNamespace": "Nordo.Level",
     "references": [
         "Nordo.Core",
+        "Nordo.Audio",
         "Nordo.Noise",
         "Nordo.Enemy",
         "Nordo.Interaction",

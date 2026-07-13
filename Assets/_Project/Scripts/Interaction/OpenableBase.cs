@@ -35,6 +35,14 @@ namespace Nordo.Interaction
         [SerializeField] private AudioClip _openClip;
         [SerializeField] private AudioClip _closeClip;
 
+        /// <summary>Runtime audio wiring (used by the level builder).</summary>
+        public void ConfigureAudio(AudioSource source, AudioClip open, AudioClip close)
+        {
+            _audioSource = source;
+            _openClip = open;
+            _closeClip = close;
+        }
+
         [Header("Noise")]
         [Range(0f, 1f)] [SerializeField] private float _noiseLoudness = 0.35f;
         [Range(1f, 30f)] [SerializeField] private float _noiseRange = 10f;

@@ -30,6 +30,17 @@ namespace Nordo.Interaction
         [Range(0f, 1f)] [SerializeField] private float _pickupNoiseLoudness = 0.12f;
         [Range(1f, 20f)] [SerializeField] private float _pickupNoiseRange = 6f;
 
+        /// <summary>Runtime wiring (used by the level builder).</summary>
+        public void Configure(float chargeAmount, ItemDefinition item = null, AudioClip pickupClip = null)
+        {
+            _chargeAmount = Mathf.Max(0f, chargeAmount);
+            _item = item;
+            if (pickupClip != null)
+            {
+                _pickupClip = pickupClip;
+            }
+        }
+
         /// <inheritdoc />
         public override string GetPrompt(in InteractionContext context)
         {

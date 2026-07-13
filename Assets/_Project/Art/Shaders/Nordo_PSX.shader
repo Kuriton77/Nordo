@@ -13,6 +13,7 @@ Shader "Nordo/PSX"
         [MainTexture] _BaseMap ("Albedo (128–256px, Point, no mips)", 2D) = "white" {}
         [MainColor]   _BaseColor ("Tint", Color) = (1,1,1,1)
         _Ambient ("Ambient Tint", Color) = (0.10, 0.13, 0.17, 1)
+        [HDR] _EmissionColor ("Emission (interaction highlight)", Color) = (0,0,0,1)
 
         _SnapAmount ("Vertex Snap Grid (lower = chunkier)", Range(8, 480)) = 140
         _AffineAmount ("Affine Warp (0 = corrected, 1 = full PSX)", Range(0, 1)) = 0.85
@@ -55,6 +56,7 @@ Shader "Nordo/PSX"
                 float4 _BaseMap_ST;
                 float4 _BaseColor;
                 float4 _Ambient;
+                float4 _EmissionColor;
                 float _SnapAmount;
                 float _AffineAmount;
                 float _LightBands;
@@ -144,6 +146,7 @@ Shader "Nordo/PSX"
                 #endif
 
                 float3 color = albedo.rgb * (lighting + _Ambient.rgb);
+                color += _EmissionColor.rgb;
                 color = MixFog(color, input.fogFactor);
                 return half4(color, albedo.a);
             }
@@ -166,7 +169,7 @@ Shader "Nordo/PSX"
 
             TEXTURE2D(_BaseMap); SAMPLER(sampler_BaseMap);
             CBUFFER_START(UnityPerMaterial)
-                float4 _BaseMap_ST; float4 _BaseColor; float4 _Ambient;
+                float4 _BaseMap_ST; float4 _BaseColor; float4 _Ambient; float4 _EmissionColor;
                 float _SnapAmount; float _AffineAmount; float _LightBands; float _Cutoff;
             CBUFFER_END
 
@@ -217,7 +220,7 @@ Shader "Nordo/PSX"
 
             TEXTURE2D(_BaseMap); SAMPLER(sampler_BaseMap);
             CBUFFER_START(UnityPerMaterial)
-                float4 _BaseMap_ST; float4 _BaseColor; float4 _Ambient;
+                float4 _BaseMap_ST; float4 _BaseColor; float4 _Ambient; float4 _EmissionColor;
                 float _SnapAmount; float _AffineAmount; float _LightBands; float _Cutoff;
             CBUFFER_END
 

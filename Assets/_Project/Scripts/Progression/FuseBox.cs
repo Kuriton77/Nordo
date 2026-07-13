@@ -30,6 +30,9 @@ namespace Nordo.Progression
         /// <summary>Sets the accepted fuse id at runtime (used by the level builder).</summary>
         public void SetRequiredFuse(string fuseId) => _requiredFuseId = fuseId;
 
+        /// <summary>Runtime audio wiring (used by the level builder).</summary>
+        public void SetInstallClip(AudioClip clip) => _installClip = clip;
+
         /// <inheritdoc />
         public override string GetPrompt(in InteractionContext context)
         {

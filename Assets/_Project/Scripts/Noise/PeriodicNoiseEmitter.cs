@@ -41,6 +41,25 @@ namespace Nordo.Noise
         /// <summary>Whether the emitter is currently running.</summary>
         public bool IsActive => _active;
 
+        /// <summary>Runtime tuning (used by the level builder).</summary>
+        public void Configure(float minInterval, float maxInterval, float loudness, float range,
+            SoundPriority priority, NoiseSourceKind kind)
+        {
+            _minInterval = Mathf.Max(0.05f, minInterval);
+            _maxInterval = Mathf.Max(_minInterval, maxInterval);
+            _loudness = Mathf.Clamp01(loudness);
+            _range = Mathf.Max(1f, range);
+            _priority = priority;
+            _kind = kind;
+        }
+
+        /// <summary>Runtime audio wiring (used by the level builder).</summary>
+        public void ConfigureAudio(AudioSource source, AudioClip[] clips)
+        {
+            _audioSource = source;
+            _clips = clips;
+        }
+
         private void OnEnable()
         {
             SetActive(_startActive);

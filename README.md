@@ -48,6 +48,7 @@ It shares only a genre with other horror titles — nothing else.
 | [`docs/MILESTONE-05.md`](docs/MILESTONE-05.md) | Milestone 5 — Noise system completion & tuning (test guide) |
 | [`docs/MILESTONE-06.md`](docs/MILESTONE-06.md) | Milestone 6 — The Listener AI + playable test area (test guide) |
 | [`docs/MILESTONE-07.md`](docs/MILESTONE-07.md) | Milestone 7 — Inventory, objectives & the first Vardø-9 section (test guide) |
+| [`docs/MILESTONE-08.md`](docs/MILESTONE-08.md) | Milestone 8 — Vardø-9 becomes a horror game: level, story, soundscape (design doc) |
 
 ## Project Layout (top level)
 
@@ -75,4 +76,4 @@ Full details in **[`docs/PROJECT_SETUP.md`](docs/PROJECT_SETUP.md)**.
 
 ## Status
 
-🚧 **Milestone 7 complete** — the **first finishable section** of Vardø-9: inventory, a multi-stage objective/puzzle chain (key → power → escape), a logbook, and the designed level, all against The Listener. See the roadmap in `docs/ARCHITECTURE.md`.
+🎮 **Milestone 8 complete — the game phase has begun.** Vardø-9 is now twelve hand-designed rooms with PSX textures, a fully synthesized soundscape, environmental storytelling, and encounter design around The Listener. Press Play and survive the first fifteen minutes. See `docs/MILESTONE-08.md`.

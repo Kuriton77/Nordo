@@ -34,6 +34,18 @@ namespace Nordo.Enemy
 
         private float _aggression; // 0 calm .. 1 hunting
 
+        /// <summary>Runtime audio wiring (used by the level builder).</summary>
+        public void ConfigureAudio(AudioSource presenceLoop, AudioSource oneShotSource,
+            AudioClip alerted, AudioClip chase, AudioClip attack, AudioClip lost)
+        {
+            _presenceLoop = presenceLoop;
+            _oneShotSource = oneShotSource;
+            _alertedClip = alerted;
+            _chaseClip = chase;
+            _attackClip = attack;
+            _lostClip = lost;
+        }
+
         private void Start()
         {
             if (_presenceLoop != null)

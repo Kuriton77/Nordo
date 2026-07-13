@@ -28,21 +28,26 @@ namespace Nordo.Level
             _enemy = enemy;
         }
 
+        private bool _firstChaseSeen;
+
         private void OnEnable()
         {
             EventBus<PlayerCaughtEvent>.Subscribe(OnCaught);
+            EventBus<ListenerStateChangedEvent>.Subscribe(OnListenerState);
         }
 
         private void OnDisable()
         {
             EventBus<PlayerCaughtEvent>.Unsubscribe(OnCaught);
+            EventBus<ListenerStateChangedEvent>.Unsubscribe(OnListenerState);
         }
 
-        /// <summary>Called when the player reaches the exit.</summary>
+        /// <summary>Called when the player sends the signal at the radio console.</summary>
         public void OnSectionComplete()
         {
             EventBus<GameMessageEvent>.Raise(new GameMessageEvent(
-                "You restored power to Vardø-9 and slipped into the dark beyond. The relay is awake — and so is it.", 8f));
+                "Your signal claws through the static, and far south of the ice a receiver wakes. " +
+                "Behind you, Vardø-9 holds its breath — listening for what answers.  SIGNAL SENT — SECTION COMPLETE.", 10f));
 
             if (_enemy != null)
             {
@@ -50,9 +55,32 @@ namespace Nordo.Level
             }
         }
 
+        /// <summary>
+        /// The world reacts to the hunt: when The Listener breaks into a chase, the station's
+        /// electrics gutter — the flashlight strobes via the emergency-flicker modulator. No scripted
+        /// jump scare, just the light failing exactly when you need it most.
+        /// </summary>
+        private void OnListenerState(ListenerStateChangedEvent evt)
+        {
+            if (evt.State != ListenerStateId.Chase)
+            {
+                return;
+            }
+
+            EventBus<EmergencyFlickerRequestEvent>.Raise(new EmergencyFlickerRequestEvent(2.2f, 0.85f));
+
+            if (!_firstChaseSeen)
+            {
+                _firstChaseSeen = true;
+                EventBus<GameMessageEvent>.Raise(new GameMessageEvent(
+                    "IT HEARS YOU. Break its line — then be still.", 4f));
+            }
+        }
+
         private void OnCaught(PlayerCaughtEvent evt)
         {
-            EventBus<GameMessageEvent>.Raise(new GameMessageEvent("It found you. Stay silent — move between its passes.", 4f));
+            EventBus<GameMessageEvent>.Raise(new GameMessageEvent(
+                "A sound. A mistake. The cold takes the rest.  —  Move slow. It cannot hear a held breath.", 4.5f));
             Respawn();
         }
 

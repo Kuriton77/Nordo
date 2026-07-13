@@ -113,6 +113,14 @@ namespace Nordo.Interaction
             _consumeKey = consumeKey;
         }
 
+        /// <summary>Runtime audio wiring (used by the level builder).</summary>
+        public void ConfigureAudio(AudioSource source, AudioClip rattle, AudioClip unlock)
+        {
+            _audioSource = source;
+            _lockedRattle = rattle;
+            _unlockSound = unlock;
+        }
+
         /// <summary>Unlocks unconditionally (e.g. a puzzle solving itself). Idempotent.</summary>
         public void Unlock()
         {

@@ -40,6 +40,9 @@ namespace Nordo.Progression
             _machine = machine;
         }
 
+        /// <summary>Runtime audio wiring (used by the level builder).</summary>
+        public void SetStartClip(AudioClip clip) => _startClip = clip;
+
         /// <inheritdoc />
         public override string GetPrompt(in InteractionContext context)
         {

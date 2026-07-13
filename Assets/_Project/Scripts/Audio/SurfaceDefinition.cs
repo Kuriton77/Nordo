@@ -77,5 +77,22 @@ namespace Nordo.Audio
         public AudioClip[] GetLandingClips() => _landingSounds;
 
         private static bool HasClips(AudioClip[] clips) => clips != null && clips.Length > 0;
+
+        /// <summary>
+        /// Creates a fully-configured surface at runtime (used by builders that author audio in code).
+        /// Prefer authored assets for hand-placed shipping content.
+        /// </summary>
+        public static SurfaceDefinition CreateRuntime(SurfaceKind kind, AudioClip[] walkClips,
+            AudioClip[] landingClips, float noiseLoudness = 0.6f, float baseVolume = 0.7f)
+        {
+            var def = CreateInstance<SurfaceDefinition>();
+            def._kind = kind;
+            def._walkFootsteps = walkClips ?? new AudioClip[0];
+            def._landingSounds = landingClips ?? new AudioClip[0];
+            def._noiseLoudness = Mathf.Clamp01(noiseLoudness);
+            def._baseVolume = Mathf.Clamp01(baseVolume);
+            def.name = $"Surface_{kind}(runtime)";
+            return def;
+        }
     }
 }

@@ -47,6 +47,27 @@ namespace Nordo.Noise
         /// <summary>Whether the machine is currently running.</summary>
         public bool IsRunning => _running;
 
+        /// <summary>Runtime audio wiring (used by the level builder).</summary>
+        public void ConfigureAudio(AudioSource loopSource, AudioSource oneShotSource, AudioClip startClip, AudioClip stopClip)
+        {
+            _loopSource = loopSource;
+            _oneShotSource = oneShotSource;
+            _startClip = startClip;
+            _stopClip = stopClip;
+        }
+
+        /// <summary>
+        /// Runtime hum tuning (used by the level builder). Design note: the steady hum is kept quiet
+        /// and short-ranged so The Listener does not camp a running generator forever — the loud part
+        /// is the one-off start spike that pulls it in for a sweep.
+        /// </summary>
+        public void ConfigureHum(float loudness, float range, Nordo.Core.SoundPriority priority)
+        {
+            _humLoudness = Mathf.Clamp01(loudness);
+            _humRange = Mathf.Max(1f, range);
+            _humPriority = priority;
+        }
+
         private void Start()
         {
             if (_startRunning)

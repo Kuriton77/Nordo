@@ -28,10 +28,14 @@ namespace Nordo.Interaction
         [Range(1f, 20f)] [SerializeField] private float _pickupNoiseRange = 6f;
 
         /// <summary>Configures the pickup at runtime (used by the level builder).</summary>
-        public void SetItem(ItemDefinition item, int quantity = 1)
+        public void SetItem(ItemDefinition item, int quantity = 1, AudioClip pickupClip = null)
         {
             _item = item;
             _quantity = Mathf.Max(1, quantity);
+            if (pickupClip != null)
+            {
+                _pickupClip = pickupClip;
+            }
         }
 
         /// <inheritdoc />

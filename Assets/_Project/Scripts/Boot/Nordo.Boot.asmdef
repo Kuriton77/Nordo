@@ -2,6 +2,7 @@
     "name": "Nordo.Boot",
     "rootNamespace": "Nordo.Boot",
     "references": [
+        "Nordo.Core",
         "Nordo.Input",
         "Nordo.Player",
         "Nordo.CameraFeel",

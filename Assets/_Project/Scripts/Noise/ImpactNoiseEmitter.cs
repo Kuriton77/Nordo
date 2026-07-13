@@ -42,6 +42,13 @@ namespace Nordo.Noise
 
         private float _lastEmitTime = -999f;
 
+        /// <summary>Runtime audio wiring (used by the level builder).</summary>
+        public void ConfigureAudio(AudioSource source, AudioClip[] clips)
+        {
+            _audioSource = source;
+            _impactClips = clips;
+        }
+
         private void OnCollisionEnter(Collision collision)
         {
             // collision.impulse already folds in both masses and the relative velocity, so it's the
